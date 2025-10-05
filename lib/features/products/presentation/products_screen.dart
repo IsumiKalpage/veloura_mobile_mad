@@ -65,12 +65,11 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               );
             },
           ),
-          const Divider(),
           ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text("Logout", style: TextStyle(color: Colors.red)),
+            leading: const Icon(Icons.shopping_cart_outlined),
+            title: const Text("Contact Us"),
             onTap: () => Navigator.pop(context),
-          ),
+          ),          
         ],
       ),
     );

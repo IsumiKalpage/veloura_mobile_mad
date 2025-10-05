@@ -7,6 +7,7 @@ import '../../settings/presentation/account_screen.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../products/providers/products_provider.dart';
 import '../../products/presentation/product_detail_screen.dart';
+import '../../orders/presentation/order_history_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -70,6 +71,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             title: const Text("Account"),
             onTap: () => setState(() => _selectedIndex = 3),
           ),
+          ListTile(
+            leading: const Icon(Icons.inventory_2_outlined),
+            title: const Text("Orders"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text("Contact Us"),
+            onTap: () => setState(() => _selectedIndex = 4),
+          )
         ],
       ),
     );

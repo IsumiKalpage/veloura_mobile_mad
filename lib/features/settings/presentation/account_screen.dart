@@ -69,6 +69,11 @@ class AccountScreen extends ConsumerWidget {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text("Contact Us"),
+            onTap: () => Navigator.pop(context),
+          ),
         ],
       ),
     );
