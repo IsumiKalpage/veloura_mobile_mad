@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/products_provider.dart';
 import '../presentation/product_detail_screen.dart';
 import '../../orders/presentation/order_history_screen.dart';
+import '../../contact/presentation/contact_screen.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -66,10 +67,16 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.shopping_cart_outlined),
+            leading: const Icon(Icons.contact_mail_outlined),
             title: const Text("Contact Us"),
-            onTap: () => Navigator.pop(context),
-          ),          
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ContactUsScreen()),
+              );
+            },
+          ),
         ],
       ),
     );
