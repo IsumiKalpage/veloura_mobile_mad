@@ -1,0 +1,69 @@
+name: veloura_mobile
+description: "A new Flutter project."
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # --- Added dependencies for MAD-2 project ---
+  # State management
+  flutter_riverpod: ^2.5.1
+  image_picker: ^1.0.7
+
+  # API calls
+  dio: ^5.7.0
+
+  # Routing
+  go_router: ^14.2.0
+
+  # Local storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^9.0.0
+
+  # Connectivity & Sensors
+  connectivity_plus: ^6.0.3
+  geolocator: ^10.1.0
+  sensors_plus: ^4.0.2
+  camera: ^0.10.5+9
+  url_launcher: ^6.3.0
+  battery_plus: ^6.0.2
+
+  # Images
+  cached_network_image: ^3.3.1
+  # --- End of added dependencies ---
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+  # Added splash screen generator
+  flutter_native_splash: ^2.3.10
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/logo.png
+    - assets/logo2.png
+    - assets/b1.png
+    - assets/b2.png
+
+# Splash screen configuration
+flutter_native_splash:
+  color: "#FFFFFF"        
+  image: assets/logo2.png  
+  android_12:
+    image: assets/logo2.png
+    color: "#FFFFFF"
