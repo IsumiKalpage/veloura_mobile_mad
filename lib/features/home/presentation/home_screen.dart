@@ -311,7 +311,7 @@ class _DashboardScreen extends ConsumerWidget {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        mainAxisExtent: 280,
+        mainAxisExtent: 300,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
@@ -321,6 +321,9 @@ class _DashboardScreen extends ConsumerWidget {
         final double price = _parseDouble(p['price']);
         final double discount = _parseDouble(p['discount']);
         final double rating = _parseDouble(p['rating']);
+        final int stock = (p['stock'] is int)
+            ? p['stock']
+            : int.tryParse(p['stock']?.toString() ?? '0') ?? 0;
 
         int percentOff = 0;
         double finalPrice = price;
@@ -335,120 +338,149 @@ class _DashboardScreen extends ConsumerWidget {
           }
         }
 
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ProductDetailScreen(product: p),
-              ),
-            );
-          },
-          child: Card(
-            color: isDark ? Colors.grey[900] : Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: isDark ? 0 : 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16)),
-                        child: Image.network(
-                          _fullImageUrl(_pickBestImage(p)),
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const Center(child: Icon(Icons.broken_image)),
-                        ),
+        String stockStatus = "Out of Stock";
+        Color stockColor = Colors.grey;
+        bool isOutOfStock = true;
+
+        if (stock > 10) {
+          stockStatus = "In Stock";
+          stockColor = Colors.green;
+          isOutOfStock = false;
+        } else if (stock > 0) {
+          stockStatus = "Low Stock";
+          stockColor = Colors.amber;
+          isOutOfStock = false;
+        }
+
+        return Opacity(
+          opacity: isOutOfStock ? 0.6 : 1.0,
+          child: InkWell(
+            onTap: isOutOfStock
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductDetailScreen(product: p),
                       ),
-                      if (showDiscountTag && percentOff > 0)
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              "-$percentOff%",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                    );
+                  },
+            child: Card(
+              color: isDark ? Colors.grey[900] : Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              elevation: isDark ? 0 : 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16)),
+                          child: Image.network(
+                            _fullImageUrl(_pickBestImage(p)),
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const Center(child: Icon(Icons.broken_image)),
+                          ),
+                        ),
+                        if (showDiscountTag && percentOff > 0)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                "-$percentOff%",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        p['name'] ?? '',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: isDark ? Colors.white : Colors.black),
-                      ),
-                      const SizedBox(height: 4),
-                      if (percentOff > 0) ...[
-                        Text(
-                          "Rs.${price.toStringAsFixed(2)}",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark ? Colors.white54 : Colors.grey,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                        Text(
-                          "Rs.${finalPrice.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFA4161A),
-                          ),
-                        ),
-                      ] else
-                        Text(
-                          "Rs.${price.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFA4161A),
-                          ),
-                        ),
-                      if (showRating) ...[
-                        const SizedBox(height: 6),
-                        Row(
-                          children: List.generate(5, (i) {
-                            return Icon(
-                              i < rating.round()
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              size: 16,
-                              color: Colors.amber,
-                            );
-                          }),
-                        ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          p['name'] ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color:
+                                  isDark ? Colors.white : Colors.black),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          stockStatus,
+                          style: TextStyle(
+                            color: stockColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        if (percentOff > 0) ...[
+                          Text(
+                            "Rs.${price.toStringAsFixed(2)}",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark ? Colors.white54 : Colors.grey,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                          Text(
+                            "Rs.${finalPrice.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFA4161A),
+                            ),
+                          ),
+                        ] else
+                          Text(
+                            "Rs.${price.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFA4161A),
+                            ),
+                          ),
+                        if (showRating) ...[
+                          const SizedBox(height: 6),
+                          Row(
+                            children: List.generate(5, (i) {
+                              return Icon(
+                                i < rating.round()
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                size: 16,
+                                color: Colors.amber,
+                              );
+                            }),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
