@@ -53,6 +53,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         MediaQuery.of(context).orientation == Orientation.landscape;
 
     final theme = Theme.of(context);
+    // ignore: unused_local_variable
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(

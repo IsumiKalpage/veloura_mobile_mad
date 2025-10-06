@@ -16,10 +16,13 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = const Color(0xFFA4161A);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: isDark ? Colors.black : const Color(0xFFF9F9F9),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
         elevation: 1,
         title: SizedBox(
           height: 40,
@@ -34,32 +37,41 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           children: [
             const SizedBox(height: 10),
 
+            // Logo Container
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: Colors.white.withOpacity(0.3),
+                color: isDark
+                    ? Colors.grey[850]!.withOpacity(0.6)
+                    : Colors.white.withOpacity(0.3),
               ),
               child: Image.asset("assets/logo.png", height: 80),
             ),
             const SizedBox(height: 20),
 
-            const Text(
+            // Title
+            Text(
               "Get in Touch",
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFA4161A),
+                color: primary,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+
+            Text(
               "We’d love to hear from you! Whether you have a question, feedback, or need assistance — feel free to reach out.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black54, fontSize: 14),
+              style: TextStyle(
+                color: isDark ? Colors.white70 : Colors.black54,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 30),
 
+            // Contact info with glass effect
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: BackdropFilter(
@@ -67,15 +79,19 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.6),
+                    color: isDark
+                        ? Colors.grey[850]!.withOpacity(0.5)
+                        : Colors.white.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black12.withOpacity(0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
-                      )
+                      ),
                     ],
                   ),
                   child: Column(
@@ -105,20 +121,25 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
             const SizedBox(height: 30),
 
+            // Contact Form
             Form(
               key: _formKey,
               child: Column(
                 children: [
                   TextFormField(
                     controller: nameCtrl,
-                    decoration: _inputDecoration("Full Name"),
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black),
+                    decoration: _inputDecoration("Full Name", isDark),
                     validator: (v) =>
                         v == null || v.isEmpty ? "Enter your name" : null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: emailCtrl,
-                    decoration: _inputDecoration("Email Address"),
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black),
+                    decoration: _inputDecoration("Email Address", isDark),
                     validator: (v) {
                       if (v == null || v.isEmpty) return "Enter your email";
                       if (!v.contains("@")) return "Enter a valid email";
@@ -129,18 +150,23 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   TextFormField(
                     controller: messageCtrl,
                     maxLines: 4,
-                    decoration: _inputDecoration("Your Message"),
+                    style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black),
+                    decoration: _inputDecoration("Your Message", isDark),
                     validator: (v) =>
                         v == null || v.isEmpty ? "Enter a message" : null,
                   ),
                   const SizedBox(height: 24),
+
+                  // Send button
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Message sent successfully 💌"),
-                            backgroundColor: Color(0xFFA4161A),
+                          SnackBar(
+                            content:
+                                const Text("Message sent successfully 💌"),
+                            backgroundColor: primary,
                           ),
                         );
                         nameCtrl.clear();
@@ -149,7 +175,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFA4161A),
+                      backgroundColor: primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -175,11 +201,13 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String label) {
+  InputDecoration _inputDecoration(String label, bool isDark) {
     return InputDecoration(
       labelText: label,
+      labelStyle:
+          TextStyle(color: isDark ? Colors.white70 : Colors.black87),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: isDark ? Colors.grey[850] : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -205,11 +233,13 @@ class _ContactInfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         CircleAvatar(
           radius: 22,
-          backgroundColor: const Color(0xFFA4161A).withOpacity(0.15),
+          backgroundColor:
+              const Color(0xFFA4161A).withOpacity(isDark ? 0.25 : 0.15),
           child: Icon(icon, color: const Color(0xFFA4161A)),
         ),
         const SizedBox(width: 16),
@@ -217,15 +247,22 @@ class _ContactInfoTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 15)),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(detail,
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                  )),
+              Text(
+                detail,
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  fontSize: 13,
+                ),
+              ),
             ],
           ),
         ),

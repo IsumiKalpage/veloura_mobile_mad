@@ -22,42 +22,42 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   int? rating;
 
   Drawer _buildDrawer(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Drawer(
+      backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFFA4161A)),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : const Color(0xFFA4161A),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset("assets/logo.png", height: 50),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   "Welcome to Veloura",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
           ),
+          _drawerTile(Icons.home_outlined, "Home", () => Navigator.pop(context), isDark),
+          _drawerTile(Icons.storefront_outlined, "Products", () => Navigator.pop(context), isDark),
+          _drawerTile(Icons.shopping_cart_outlined, "Cart", () => Navigator.pop(context), isDark),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text("Home"),
-            onTap: () => Navigator.pop(context),
-          ),
-          ListTile(
-            leading: const Icon(Icons.storefront_outlined),
-            title: const Text("Products"),
-            onTap: () => Navigator.pop(context),
-          ),
-          ListTile(
-            leading: const Icon(Icons.shopping_cart_outlined),
-            title: const Text("Cart"),
-            onTap: () => Navigator.pop(context),
-          ),
-          ListTile(
-            leading: const Icon(Icons.inventory_2_outlined),
-            title: const Text("Orders"),
+            leading: Icon(Icons.inventory_2_outlined,
+                color: isDark ? Colors.white70 : Colors.black87),
+            title: Text("Orders",
+                style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w500)),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -67,10 +67,14 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.contact_mail_outlined),
-            title: const Text("Contact Us"),
+            leading: Icon(Icons.contact_mail_outlined,
+                color: isDark ? Colors.white70 : Colors.black87),
+            title: Text("Contact Us",
+                style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w500)),
             onTap: () {
-              Navigator.pop(context); // Close the drawer
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ContactUsScreen()),
@@ -82,13 +86,30 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     );
   }
 
+  ListTile _drawerTile(IconData icon, String title, VoidCallback onTap, bool isDark) {
+    return ListTile(
+      leading: Icon(icon, color: isDark ? Colors.white70 : Colors.black87),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+
   void _openFilterSheet() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final brandController = TextEditingController(text: brand ?? "");
     final minController = TextEditingController(text: minPrice?.toString() ?? "");
     final maxController = TextEditingController(text: maxPrice?.toString() ?? "");
     int? tempRating = rating;
 
     showModalBottomSheet(
+      backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       context: context,
       isScrollControlled: true,
       builder: (context) => SafeArea(
@@ -104,29 +125,42 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Filters",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text("Filters",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black)),
                   const SizedBox(height: 16),
-
                   TextField(
                     controller: brandController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: "Brand",
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      labelStyle: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                      filled: true,
+                      fillColor: isDark ? Colors.grey[850] : Colors.white,
                     ),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
                   ),
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: minController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: "Min Price",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
+                            labelStyle: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                            filled: true,
+                            fillColor: isDark ? Colors.grey[850] : Colors.white,
                           ),
+                          style: TextStyle(color: isDark ? Colors.white : Colors.black),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -134,22 +168,31 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                         child: TextField(
                           controller: maxController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: "Max Price",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
+                            labelStyle: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                            filled: true,
+                            fillColor: isDark ? Colors.grey[850] : Colors.white,
                           ),
+                          style: TextStyle(color: isDark ? Colors.white : Colors.black),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-
                   DropdownButtonFormField<int>(
                     value: tempRating ?? 0,
                     isExpanded: true,
-                    decoration: const InputDecoration(
+                    dropdownColor: isDark ? Colors.grey[850] : Colors.white,
+                    decoration: InputDecoration(
                       labelText: "Minimum Rating",
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      labelStyle: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
                     ),
                     items: [
                       const DropdownMenuItem<int>(value: 0, child: Text("Any")),
@@ -165,7 +208,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                         setModalState(() => tempRating = (val == 0 ? null : val)),
                   ),
                   const SizedBox(height: 20),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -185,6 +227,9 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                         child: const Text("Clear"),
                       ),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFA4161A),
+                        ),
                         onPressed: () {
                           setState(() {
                             brand = brandController.text.isNotEmpty
@@ -209,7 +254,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                               );
                           Navigator.pop(context);
                         },
-                        child: const Text("Apply"),
+                        child: const Text("Apply", style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
@@ -224,16 +269,18 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final productsAsync = ref.watch(productsProvider);
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.black : Colors.white,
       drawer: _buildDrawer(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black87),
+            icon: Icon(Icons.menu, color: isDark ? Colors.white70 : Colors.black87),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -244,7 +291,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline, color: Colors.black87),
+            icon: Icon(Icons.person_outline, color: isDark ? Colors.white70 : Colors.black87),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Profile tapped")),
@@ -252,7 +299,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.black87),
+            icon: Icon(Icons.filter_list, color: isDark ? Colors.white70 : Colors.black87),
             onPressed: _openFilterSheet,
           ),
         ],
@@ -271,12 +318,14 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               ],
             ),
           ),
-
           Expanded(
             child: productsAsync.when(
               data: (products) {
                 if (products.isEmpty) {
-                  return const Center(child: Text("No products found"));
+                  return Center(
+                    child: Text("No products found",
+                        style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                  );
                 }
 
                 final screenWidth = MediaQuery.of(context).size.width;
@@ -305,13 +354,15 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     ),
                     itemBuilder: (context, index) {
                       final product = products[index];
-                      return _productCard(product);
+                      return _productCard(product, isDark);
                     },
                   ),
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, st) => Center(child: Text("Error: $err")),
+              loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFA4161A))),
+              error: (err, st) => Center(
+                child: Text("Error: $err", style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+              ),
             ),
           ),
         ],
@@ -327,7 +378,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
         label: Text(label),
         selected: isSelected,
         selectedColor: const Color(0xFFA4161A),
-        backgroundColor: Colors.grey[200],
+        backgroundColor: Colors.grey[300],
         labelStyle: TextStyle(
           color: isSelected ? Colors.white : Colors.black87,
         ),
@@ -349,7 +400,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     );
   }
 
-  Widget _productCard(Map<String, dynamic> product) {
+  Widget _productCard(Map<String, dynamic> product, bool isDark) {
     final imageUrl = product["image_url"] ??
         product["image"] ??
         product["image_path"] ??
@@ -382,8 +433,9 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
         );
       },
       child: Card(
+        color: isDark ? Colors.grey[900] : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 3,
+        elevation: isDark ? 0 : 3,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -436,15 +488,17 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                     product["name"] ?? "No name",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black),
                   ),
                   const SizedBox(height: 4),
                   if (percentOff > 0) ...[
                     Text(
                       "Rs.${price.toStringAsFixed(2)}",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey,
+                        color: isDark ? Colors.white60 : Colors.grey,
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),

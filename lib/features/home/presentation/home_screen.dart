@@ -33,47 +33,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Drawer _buildDrawer(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Drawer(
+      backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFFA4161A)),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[850] : const Color(0xFFA4161A),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset("assets/logo.png", height: 50),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   "Welcome to Veloura",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
           ),
+          _drawerTile(Icons.home_outlined, "Home", () => setState(() => _selectedIndex = 0), isDark),
+          _drawerTile(Icons.storefront_outlined, "Products", () => setState(() => _selectedIndex = 1), isDark),
+          _drawerTile(Icons.shopping_cart_outlined, "Cart", () => setState(() => _selectedIndex = 2), isDark),
+          _drawerTile(Icons.person_outline, "Account", () => setState(() => _selectedIndex = 3), isDark),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text("Home"),
-            onTap: () => setState(() => _selectedIndex = 0),
-          ),
-          ListTile(
-            leading: const Icon(Icons.storefront_outlined),
-            title: const Text("Products"),
-            onTap: () => setState(() => _selectedIndex = 1),
-          ),
-          ListTile(
-            leading: const Icon(Icons.shopping_cart_outlined),
-            title: const Text("Cart"),
-            onTap: () => setState(() => _selectedIndex = 2),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text("Account"),
-            onTap: () => setState(() => _selectedIndex = 3),
-          ),
-          ListTile(
-            leading: const Icon(Icons.inventory_2_outlined),
-            title: const Text("Orders"),
+            leading: Icon(Icons.inventory_2_outlined,
+                color: isDark ? Colors.white70 : Colors.black87),
+            title: Text("Orders",
+                style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w500)),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -87,19 +83,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  ListTile _drawerTile(IconData icon, String text, VoidCallback onTap, bool isDark) {
+    return ListTile(
+      leading: Icon(icon, color: isDark ? Colors.white70 : Colors.black87),
+      title: Text(text,
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.w500,
+          )),
+      onTap: onTap,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final cartItems = ref.watch(userCartProvider);
     final totalItems = cartItems.fold(0, (sum, item) => sum + item.quantity);
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: _selectedIndex == 0
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: isDark ? Colors.grey[900] : Colors.white,
               elevation: 1,
               leading: Builder(
                 builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.black87),
+                  icon: Icon(Icons.menu,
+                      color: isDark ? Colors.white70 : Colors.black87),
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
               ),
@@ -110,7 +121,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.person_outline, color: Colors.black87),
+                  icon: Icon(Icons.person_outline,
+                      color: isDark ? Colors.white70 : Colors.black87),
                   onPressed: () {
                     setState(() => _selectedIndex = 3);
                   },
@@ -125,8 +137,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFFA4161A),
-        unselectedItemColor: Colors.black54,
-        backgroundColor: Colors.white,
+        unselectedItemColor: isDark ? Colors.white70 : Colors.black54,
+        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -183,13 +195,16 @@ class _DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final productsAsync = ref.watch(productsProvider);
 
     return productsAsync.when(
       loading: () => const Center(
         child: CircularProgressIndicator(color: Color(0xFFA4161A)),
       ),
-      error: (e, _) => Center(child: Text("Error loading products: $e")),
+      error: (e, _) => Center(
+          child: Text("Error loading products: $e",
+              style: TextStyle(color: isDark ? Colors.white : Colors.black))),
       data: (all) {
         final sorted = List<Map<String, dynamic>>.from(all);
         sorted.sort((a, b) {
@@ -230,12 +245,12 @@ class _DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              const Text(
+              Text(
                 "Latest Products",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFA4161A),
+                  color: isDark ? Colors.white : const Color(0xFFA4161A),
                 ),
               ),
               const SizedBox(height: 12),
@@ -254,12 +269,12 @@ class _DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 28),
 
-              const Text(
+              Text(
                 "Discounted Products",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFA4161A),
+                  color: isDark ? Colors.white : const Color(0xFFA4161A),
                 ),
               ),
               const SizedBox(height: 12),
@@ -277,8 +292,11 @@ class _DashboardScreen extends ConsumerWidget {
     bool showDiscountTag = false,
     bool showRating = false,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (products.isEmpty) {
-      return const Text("No products available.");
+      return Text("No products available.",
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87));
     }
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -327,9 +345,10 @@ class _DashboardScreen extends ConsumerWidget {
             );
           },
           child: Card(
+            color: isDark ? Colors.grey[900] : Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 3,
+            elevation: isDark ? 0 : 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -380,16 +399,18 @@ class _DashboardScreen extends ConsumerWidget {
                         p['name'] ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: isDark ? Colors.white : Colors.black),
                       ),
                       const SizedBox(height: 4),
                       if (percentOff > 0) ...[
                         Text(
                           "Rs.${price.toStringAsFixed(2)}",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey,
+                            color: isDark ? Colors.white54 : Colors.grey,
                             decoration: TextDecoration.lineThrough,
                           ),
                         ),
