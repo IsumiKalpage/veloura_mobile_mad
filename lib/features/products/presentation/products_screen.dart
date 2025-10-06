@@ -38,9 +38,9 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               children: [
                 Image.asset("assets/logo.png", height: 50),
                 const SizedBox(height: 8),
-                Text(
+                const Text(
                   "Welcome to Veloura",
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
@@ -271,6 +271,8 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final productsAsync = ref.watch(productsProvider);
+    final notifier = ref.read(productsProvider.notifier);
+    final isOffline = notifier.isOffline; 
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
@@ -306,6 +308,19 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
       ),
       body: Column(
         children: [
+          if (isOffline)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              width: double.infinity,
+              color: Colors.amber.shade700,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: const Center(
+                child: Text(
+                  "⚠️ You are viewing offline data",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -323,8 +338,10 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
               data: (products) {
                 if (products.isEmpty) {
                   return Center(
-                    child: Text("No products found",
-                        style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                    child: Text(
+                      "No products found",
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                    ),
                   );
                 }
 
@@ -359,11 +376,13 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   ),
                 );
               },
-              loading: () =>
-                  const Center(child: CircularProgressIndicator(color: Color(0xFFA4161A))),
+              loading: () => const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFA4161A))),
               error: (err, st) => Center(
-                child: Text("Error: $err",
-                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                child: Text(
+                  "Error: $err",
+                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                ),
               ),
             ),
           ),
@@ -412,7 +431,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     final double discount = _parseDouble(product["discount"]);
     final double rating = _parseDouble(product["rating"]);
 
-    final int stock = int.tryParse(product["stock"].toString()) ?? 0;
+    final int stock = int.tryParse(product["stock"]?.toString() ?? "0") ?? 0;
     String stockLabel;
     Color stockColor;
 
@@ -541,7 +560,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                           ),
                         ),
                       const SizedBox(height: 6),
-                      // 🔹 Stock label
                       Row(
                         children: [
                           Icon(Icons.circle, size: 10, color: stockColor),
