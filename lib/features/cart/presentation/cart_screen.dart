@@ -11,12 +11,18 @@ class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
   Drawer _buildDrawer(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Drawer(
+      backgroundColor: theme.scaffoldBackgroundColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFFA4161A)),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFA4161A),
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -53,7 +59,7 @@ class CartScreen extends ConsumerWidget {
             leading: const Icon(Icons.inventory_2_outlined),
             title: const Text("Orders"),
             onTap: () {
-              Navigator.pop(context); 
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
@@ -72,6 +78,9 @@ class CartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final authState = ref.watch(authStateProvider).value;
     final email = authState?["user"]?["email"] ?? "";
 
@@ -79,13 +88,15 @@ class CartScreen extends ConsumerWidget {
     final cartNotifier = ref.read(cartProvider.notifier);
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       drawer: _buildDrawer(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black87),
+            icon: Icon(Icons.menu,
+                color: isDark ? Colors.white70 : Colors.black87),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -96,7 +107,8 @@ class CartScreen extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline, color: Colors.black87),
+            icon: Icon(Icons.person_outline,
+                color: isDark ? Colors.white70 : Colors.black87),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Profile tapped")),
@@ -106,10 +118,14 @@ class CartScreen extends ConsumerWidget {
         ],
       ),
       body: cartItems.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
                 "🛒 Your cart is empty",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white70 : Colors.black,
+                ),
               ),
             )
           : ListView.builder(
@@ -126,7 +142,6 @@ class CartScreen extends ConsumerWidget {
                         ? rawPrice
                         : double.tryParse(rawPrice.toString()) ?? 0.0;
 
-                // ✅ Apply discount if available
                 final rawDiscount = product["discount"];
                 final double discount = (rawDiscount is num)
                     ? rawDiscount.toDouble()
@@ -155,7 +170,7 @@ class CartScreen extends ConsumerWidget {
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.cardColor,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -180,7 +195,6 @@ class CartScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 14),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,9 +203,12 @@ class CartScreen extends ConsumerWidget {
                                   product["name"] ?? "No name",
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 6),
@@ -223,16 +240,16 @@ class CartScreen extends ConsumerWidget {
                                   ),
                                 Text(
                                   "Subtotal: Rs. ${lineTotal.toStringAsFixed(2)}",
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                    color:
+                                        isDark ? Colors.white70 : Colors.black87,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-
                           Column(
                             children: [
                               Row(
@@ -245,15 +262,20 @@ class CartScreen extends ConsumerWidget {
                                             email, product, item.quantity - 1);
                                       }
                                     },
+                                    isDark: isDark,
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8),
                                     child: Text(
                                       "${item.quantity}",
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
                                     ),
                                   ),
                                   _qtyButton(
@@ -262,6 +284,7 @@ class CartScreen extends ConsumerWidget {
                                       cartNotifier.updateQuantity(
                                           email, product, item.quantity + 1);
                                     },
+                                    isDark: isDark,
                                   ),
                                 ],
                               ),
@@ -284,13 +307,13 @@ class CartScreen extends ConsumerWidget {
           ? null
           : Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: theme.cardColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
+                    color: Colors.black26.withOpacity(0.15),
                     blurRadius: 8,
-                    offset: Offset(0, -2),
+                    offset: const Offset(0, -2),
                   )
                 ],
               ),
@@ -303,10 +326,10 @@ class CartScreen extends ConsumerWidget {
                           ref.watch(cartProvider.notifier).totalPrice(email);
                       return Text(
                         "Total: Rs. ${total.toStringAsFixed(2)}",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       );
                     },
@@ -343,17 +366,25 @@ class CartScreen extends ConsumerWidget {
     );
   }
 
-  Widget _qtyButton({required IconData icon, required VoidCallback onTap}) {
+  Widget _qtyButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
           shape: BoxShape.circle,
         ),
         padding: const EdgeInsets.all(6),
-        child: Icon(icon, size: 18, color: Colors.black87),
+        child: Icon(
+          icon,
+          size: 18,
+          color: isDark ? Colors.white70 : Colors.black87,
+        ),
       ),
     );
   }

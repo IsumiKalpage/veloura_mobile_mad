@@ -9,12 +9,16 @@ class OrderHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final authState = ref.watch(authStateProvider).value;
     final email = authState?["user"]?["email"] ?? "";
 
     final ordersAsync = ref.watch(orderProvider(email));
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           "My Orders",
@@ -25,12 +29,14 @@ class OrderHistoryScreen extends ConsumerWidget {
         ),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 233, 175, 177),
-                Color.fromARGB(255, 234, 204, 207)
-              ],
+              colors: isDark
+                  ? [const Color(0xFF3A3A3A), const Color(0xFF2C2C2C)]
+                  : [
+                      const Color.fromARGB(255, 233, 175, 177),
+                      const Color.fromARGB(255, 234, 204, 207)
+                    ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -40,10 +46,14 @@ class OrderHistoryScreen extends ConsumerWidget {
       body: ordersAsync.when(
         data: (orders) {
           if (orders.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
                 "No orders found.",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
               ),
             );
           }
@@ -67,11 +77,12 @@ class OrderHistoryScreen extends ConsumerWidget {
                   );
                 },
                 child: Card(
+                  color: isDark ? Colors.grey[900] : Colors.white,
                   margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 3,
+                  elevation: isDark ? 0 : 3,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -79,17 +90,18 @@ class OrderHistoryScreen extends ConsumerWidget {
                       children: [
                         Text(
                           "Order #${order["_id"] ?? ""}",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
+                            color: isDark ? Colors.white : Colors.black,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           "Placed on: $createdAt",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: Colors.black54,
+                            color: isDark ? Colors.white60 : Colors.black54,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -135,7 +147,10 @@ class OrderHistoryScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(
-          child: Text("Error: $err"),
+          child: Text(
+            "Error: $err",
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
         ),
       ),
     );

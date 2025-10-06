@@ -53,10 +53,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   double _getFinalPrice(Map<String, dynamic> product) {
-    final double price =
-        double.tryParse(product["price"].toString()) ?? 0.0;
-    final double discount =
-        double.tryParse(product["discount"].toString()) ?? 0.0;
+    final double price = double.tryParse(product["price"].toString()) ?? 0.0;
+    final double discount = double.tryParse(product["discount"].toString()) ?? 0.0;
 
     if (discount > 0) {
       if (discount < 100) {
@@ -70,6 +68,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final authState = ref.watch(authStateProvider).value;
     final email = authState?["user"]?["email"] ?? "";
     emailCtrl.text = email;
@@ -86,6 +87,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final double total = subtotal + shipping + tax;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           "Checkout",
@@ -93,9 +95,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFE9AFB1), Color(0xFFEACCCF)],
+              colors: isDark
+                  ? [const Color(0xFF3A3A3A), const Color(0xFF2C2C2C)]
+                  : [const Color(0xFFE9AFB1), const Color(0xFFEACCCF)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -109,46 +113,50 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _section("Personal Information"),
+              _section("Personal Information", isDark),
               _row2(
-                _field("Full Name", nameCtrl, required: true),
-                _field("Email", emailCtrl, readOnly: true),
+                _field("Full Name", nameCtrl, required: true, isDark: isDark),
+                _field("Email", emailCtrl, readOnly: true, isDark: isDark),
               ),
               _field("Phone Number", phoneCtrl,
-                  keyboard: TextInputType.phone, required: true),
+                  keyboard: TextInputType.phone, required: true, isDark: isDark),
               const SizedBox(height: 16),
 
-              _section("Shipping Address"),
-              _field("Address", shippingAddressCtrl, required: true),
+              _section("Shipping Address", isDark),
+              _field("Address", shippingAddressCtrl, required: true, isDark: isDark),
               _row2(
-                _field("City", shippingCityCtrl, required: true),
-                _field("District", shippingDistrictCtrl, required: true),
+                _field("City", shippingCityCtrl, required: true, isDark: isDark),
+                _field("District", shippingDistrictCtrl, required: true, isDark: isDark),
               ),
               _field("Postal Code", shippingPostalCtrl,
-                  keyboard: TextInputType.number, required: true),
+                  keyboard: TextInputType.number, required: true, isDark: isDark),
               const SizedBox(height: 16),
 
-              _section("Payment Method"),
+              _section("Payment Method", isDark),
               Row(
                 children: [
                   Radio<String>(
                     value: "cod",
                     groupValue: paymentMethod,
                     onChanged: (v) => setState(() => paymentMethod = v!),
+                    activeColor: const Color(0xFFA4161A),
                   ),
-                  const Text("Cash on Delivery"),
+                  Text("Cash on Delivery",
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                   const SizedBox(width: 16),
                   Radio<String>(
                     value: "card",
                     groupValue: paymentMethod,
                     onChanged: (v) => setState(() => paymentMethod = v!),
+                    activeColor: const Color(0xFFA4161A),
                   ),
-                  const Text("Card Payment"),
+                  Text("Card Payment",
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                 ],
               ),
               const SizedBox(height: 16),
 
-              _section("Billing Address"),
+              _section("Billing Address", isDark),
               CheckboxListTile(
                 value: sameAsShipping,
                 onChanged: (v) {
@@ -165,39 +173,46 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     billingPostalCtrl.clear();
                   }
                 },
-                title: const Text("Same as Shipping Address"),
+                title: Text(
+                  "Same as Shipping Address",
+                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                ),
                 controlAffinity: ListTileControlAffinity.leading,
                 contentPadding: EdgeInsets.zero,
+                activeColor: const Color(0xFFA4161A),
               ),
-              _field("Address", billingAddressCtrl),
+              _field("Address", billingAddressCtrl, isDark: isDark),
               _row2(
-                _field("City", billingCityCtrl),
-                _field("District", billingDistrictCtrl),
+                _field("City", billingCityCtrl, isDark: isDark),
+                _field("District", billingDistrictCtrl, isDark: isDark),
               ),
               _field("Postal Code", billingPostalCtrl,
-                  keyboard: TextInputType.number),
+                  keyboard: TextInputType.number, isDark: isDark),
               const SizedBox(height: 16),
 
-              _section("Additional Requirements"),
-              _field("Notes", notesCtrl, maxLines: 3),
+              _section("Additional Requirements", isDark),
+              _field("Notes", notesCtrl, maxLines: 3, isDark: isDark),
               const SizedBox(height: 16),
 
-              _section("Order Summary"),
+              _section("Order Summary", isDark),
               Card(
+                color: isDark ? Colors.grey[900] : Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
-                elevation: 3,
+                elevation: isDark ? 0 : 3,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Column(
                     children: [
-                      _summaryRow("Subtotal", subtotal),
-                      _summaryRow("Shipping", shipping),
-                      _summaryRow("Tax", tax),
+                      _summaryRow("Subtotal", subtotal, isDark: isDark),
+                      _summaryRow("Shipping", shipping, isDark: isDark),
+                      _summaryRow("Tax", tax, isDark: isDark),
                       const Divider(),
                       _summaryRow("Total", total,
-                          bold: true, color: const Color(0xFFA4161A)),
+                          bold: true,
+                          color: const Color(0xFFA4161A),
+                          isDark: isDark),
                     ],
                   ),
                 ),
@@ -215,7 +230,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       return {
                         "id": i.product["id"] ?? i.product["_id"],
                         "name": i.product["name"],
-                        "price": finalPrice, 
+                        "price": finalPrice,
                         "quantity": i.quantity,
                       };
                     }).toList();
@@ -244,7 +259,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     try {
                       await ref.read(placeOrderProvider(orderData).future);
 
-                      // ✅ Clear cart after order success
                       ref.read(cartProvider.notifier).clearUserCart(email);
                       ref.invalidate(orderProvider(email));
 
@@ -283,10 +297,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  Widget _section(String title) => Padding(
+  Widget _section(String title, bool isDark) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.black)),
       );
 
   Widget _row2(Widget left, Widget right) => Row(
@@ -304,6 +321,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     TextInputType keyboard = TextInputType.text,
     int maxLines = 1,
     bool readOnly = false,
+    bool isDark = false,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -315,18 +333,31 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         validator: required
             ? (v) => (v == null || v.trim().isEmpty) ? "Required" : null
             : null,
+        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle:
+              TextStyle(color: isDark ? Colors.white70 : Colors.black54),
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor: isDark ? Colors.grey[850] : Colors.grey.shade100,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          enabledBorder: OutlineInputBorder(
+            borderSide:
+                BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide:
+                const BorderSide(color: Color(0xFFA4161A), width: 1.5),
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
   }
 
   Widget _summaryRow(String label, double value,
-      {bool bold = false, Color? color}) {
+      {bool bold = false, Color? color, bool isDark = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -335,12 +366,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           Text(label,
               style: TextStyle(
                   fontSize: 15,
-                  fontWeight: bold ? FontWeight.bold : FontWeight.w500)),
+                  fontWeight: bold ? FontWeight.bold : FontWeight.w500,
+                  color: isDark ? Colors.white70 : Colors.black87)),
           Text("Rs.${value.toStringAsFixed(2)}",
               style: TextStyle(
                   fontSize: 15,
                   fontWeight: bold ? FontWeight.bold : FontWeight.w600,
-                  color: color ?? Colors.black87)),
+                  color: color ??
+                      (isDark ? Colors.white : Colors.black87))),
         ],
       ),
     );

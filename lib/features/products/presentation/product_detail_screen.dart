@@ -52,8 +52,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: isLandscape
           ? Row(
               children: [
@@ -132,11 +135,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     ],
                   ),
                 ),
-
                 Expanded(
                   flex: 6,
                   child: _buildDetails(
-                      context, product, price, finalPrice, savings, percentOff, rating, email),
+                      context,
+                      product,
+                      price,
+                      finalPrice,
+                      savings,
+                      percentOff,
+                      rating,
+                      email),
                 ),
               ],
             )
@@ -177,7 +186,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                   ],
                 ),
-
                 SafeArea(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,27 +221,35 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     ],
                   ),
                 ),
-
                 DraggableScrollableSheet(
                   initialChildSize: 0.65,
                   minChildSize: 0.65,
                   maxChildSize: 0.95,
                   builder: (context, scrollController) {
                     return _buildDetails(
-                        context, product, price, finalPrice, savings, percentOff, rating, email,
+                        context,
+                        product,
+                        price,
+                        finalPrice,
+                        savings,
+                        percentOff,
+                        rating,
+                        email,
                         scrollController: scrollController);
                   },
                 ),
               ],
             ),
-
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: theme.cardColor,
           boxShadow: [
             BoxShadow(
-                color: Colors.black12, blurRadius: 6, offset: Offset(0, -2))
+              color: Colors.black12.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, -2),
+            ),
           ],
         ),
         child: ElevatedButton.icon(
@@ -282,16 +298,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     String email, {
     ScrollController? scrollController,
   }) {
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.bodyMedium?.color ?? Colors.black87;
+
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
-            offset: Offset(0, -4),
+            offset: const Offset(0, -4),
           )
         ],
       ),
@@ -302,10 +321,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           children: [
             Text(
               product["name"] ?? "No name",
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: theme.textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
 
@@ -320,10 +337,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
               Text(
                 "Rs.${finalPrice.toStringAsFixed(2)}",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFA4161A),
+                  color: const Color(0xFFA4161A),
                 ),
               ),
               const SizedBox(height: 6),
@@ -362,17 +379,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
             Row(
               children: [
-                const Text(
+                Text(
                   "Quantity:",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: theme.textTheme.bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(width: 16),
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
+                    border: Border.all(
+                        color: theme.dividerColor.withOpacity(0.4)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -388,7 +404,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                       Text(
                         "$quantity",
-                        style: const TextStyle(fontSize: 16),
+                        style: TextStyle(
+                            fontSize: 16, color: textColor),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
@@ -403,45 +420,44 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Description
-            const Text(
+            Text(
               "Description",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
             Text(
               product["description"] ??
                   "No description available for this product.",
-              style: const TextStyle(
-                fontSize: 15,
-                color: Colors.black87,
-                height: 1.5,
-              ),
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(height: 1.5, color: textColor),
             ),
             const SizedBox(height: 20),
 
-            // Info
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 ListTile(
-                  leading: Icon(Icons.local_shipping, color: Colors.orange),
-                  title: Text("Delivery Charge LKR 350"),
+                  leading: const Icon(Icons.local_shipping,
+                      color: Colors.orange),
+                  title: Text("Delivery Charge LKR 350",
+                      style: TextStyle(color: textColor)),
                 ),
                 ListTile(
-                  leading: Icon(Icons.verified, color: Colors.green),
-                  title: Text("Guaranteed 100% Authentic Products"),
+                  leading:
+                      const Icon(Icons.verified, color: Colors.green),
+                  title: Text("Guaranteed 100% Authentic Products",
+                      style: TextStyle(color: textColor)),
                 ),
                 ListTile(
-                  leading: Icon(Icons.public, color: Colors.blue),
-                  title: Text("Imported from South Korea"),
+                  leading: const Icon(Icons.public, color: Colors.blue),
+                  title: Text("Imported from South Korea",
+                      style: TextStyle(color: textColor)),
                 ),
                 ListTile(
-                  leading: Icon(Icons.lock, color: Colors.amber),
-                  title: Text("Secure payments"),
+                  leading: const Icon(Icons.lock, color: Colors.amber),
+                  title: Text("Secure payments",
+                      style: TextStyle(color: textColor)),
                 ),
               ],
             ),
