@@ -59,6 +59,7 @@ flutter:
     - assets/logo2.png
     - assets/b1.png
     - assets/b2.png
+    - assets/products_fallback.json   
 
 # Splash screen configuration
 flutter_native_splash:

@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Veloura Moisturizing Cream",
+    "price": 2500,
+    "discount": 10,
+    "rating": 5,
+    "image_url": "https://via.placeholder.com/400x300?text=Veloura+Cream",
+    "category": "skincare",
+    "brand": "Veloura"
+  },
+  {
+    "id": 2,
+    "name": "Veloura Cleanser",
+    "price": 1800,
+    "discount": 0,
+    "rating": 4,
+    "image_url": "https://via.placeholder.com/400x300?text=Veloura+Cleanser",
+    "category": "skincare",
+    "brand": "Veloura"
+  }
+]

@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import '../../../core/api/dio_client.dart';
 
 class ProductFilter {
@@ -28,8 +32,10 @@ class ProductFilter {
   }
 }
 
-class ProductsNotifier extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
-  ProductsNotifier(this._dio, this.filter) : super(const AsyncValue.loading());
+class ProductsNotifier
+    extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
+  ProductsNotifier(this._dio, this.filter)
+      : super(const AsyncValue.loading());
 
   final Dio _dio;
   ProductFilter filter;
@@ -37,8 +43,42 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Map<String, dynamic
   int _currentPage = 1;
   bool _hasMore = true;
   bool _isLoading = false;
+  bool _isOffline = false; 
+
+  bool get isOffline => _isOffline;
 
   final List<Map<String, dynamic>> _products = [];
+
+  Future<File> _localFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return File('${dir.path}/products_cache.json');
+  }
+
+  Future<void> _saveToLocalFile(List<Map<String, dynamic>> data) async {
+    try {
+      final file = await _localFile();
+      await file.writeAsString(jsonEncode(data));
+    } catch (_) {}
+  }
+
+  Future<List<Map<String, dynamic>>> _loadLocalFallback() async {
+    try {
+      final file = await _localFile();
+      if (await file.exists()) {
+        final raw = await file.readAsString();
+        return List<Map<String, dynamic>>.from(jsonDecode(raw));
+      } else {
+        final raw =
+            await rootBundle.loadString('assets/products_fallback.json');
+        final List list = jsonDecode(raw) as List;
+        return List<Map<String, dynamic>>.from(
+          list.map((e) => Map<String, dynamic>.from(e as Map)),
+        );
+      }
+    } catch (_) {
+      return [];
+    }
+  }
 
   Future<void> loadProducts({bool refresh = false}) async {
     if (_isLoading) return;
@@ -61,20 +101,29 @@ class ProductsNotifier extends StateNotifier<AsyncValue<List<Map<String, dynamic
       final List<Map<String, dynamic>> newProducts =
           List<Map<String, dynamic>>.from(data["data"] ?? []);
 
-      if (refresh) {
-        _products.clear();
-      }
+      if (refresh) _products.clear();
       _products.addAll(newProducts);
 
       final currentPage = data["current_page"] ?? 1;
       final lastPage = data["last_page"] ?? 1;
-
       _hasMore = currentPage < lastPage;
       if (_hasMore) _currentPage++;
 
+      _isOffline = false; 
+
       state = AsyncValue.data(List.from(_products));
+
+
+      await _saveToLocalFile(_products);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      final cachedProducts = await _loadLocalFallback();
+      if (cachedProducts.isNotEmpty) {
+        _isOffline = true; 
+        state = AsyncValue.data(List.from(cachedProducts));
+      } else {
+        _isOffline = false;
+        state = AsyncValue.error("Failed to load products: $e", st);
+      }
     } finally {
       _isLoading = false;
     }
