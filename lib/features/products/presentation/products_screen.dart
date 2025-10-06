@@ -40,7 +40,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   "Welcome to Veloura",
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
@@ -271,8 +271,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final productsAsync = ref.watch(productsProvider);
-    final notifier = ref.read(productsProvider.notifier);
-    final isOffline = notifier.isOffline;
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
@@ -308,19 +306,6 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
       ),
       body: Column(
         children: [
-          if (isOffline)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              width: double.infinity,
-              color: Colors.amber.shade700,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: const Center(
-                child: Text(
-                  "⚠️ You are viewing offline data",
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -427,6 +412,21 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     final double discount = _parseDouble(product["discount"]);
     final double rating = _parseDouble(product["rating"]);
 
+    final int stock = int.tryParse(product["stock"].toString()) ?? 0;
+    String stockLabel;
+    Color stockColor;
+
+    if (stock == 0) {
+      stockLabel = "Out of Stock";
+      stockColor = Colors.grey;
+    } else if (stock <= 5) {
+      stockLabel = "Low Stock";
+      stockColor = Colors.amber;
+    } else {
+      stockLabel = "In Stock";
+      stockColor = Colors.green;
+    }
+
     int percentOff = 0;
     double finalPrice = price;
 
@@ -440,118 +440,141 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
       }
     }
 
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(product: product),
-          ),
-        );
-      },
-      child: Card(
-        color: isDark ? Colors.grey[900] : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: isDark ? 0 : 3,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error, color: Colors.red),
-                    ),
-                  ),
-                  if (percentOff > 0)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(6),
+    final bool isOutOfStock = stock == 0;
+
+    return Opacity(
+      opacity: isOutOfStock ? 0.5 : 1,
+      child: IgnorePointer(
+        ignoring: isOutOfStock,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailScreen(product: product),
+              ),
+            );
+          },
+          child: Card(
+            color: isDark ? Colors.grey[900] : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: isDark ? 0 : 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius:
+                            const BorderRadius.vertical(top: Radius.circular(12)),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error, color: Colors.red),
                         ),
-                        child: Text(
-                          "-$percentOff%",
+                      ),
+                      if (percentOff > 0)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              "-$percentOff%",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product["name"] ?? "No name",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black),
+                      ),
+                      const SizedBox(height: 4),
+                      if (percentOff > 0) ...[
+                        Text(
+                          "Rs.${price.toStringAsFixed(2)}",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? Colors.white60 : Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        Text(
+                          "Rs.${finalPrice.toStringAsFixed(2)}",
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFA4161A),
+                          ),
+                        ),
+                      ] else
+                        Text(
+                          "Rs.${price.toStringAsFixed(2)}",
+                          style: const TextStyle(
+                            color: Color(0xFFA4161A),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      const SizedBox(height: 6),
+                      // 🔹 Stock label
+                      Row(
+                        children: [
+                          Icon(Icons.circle, size: 10, color: stockColor),
+                          const SizedBox(width: 6),
+                          Text(
+                            stockLabel,
+                            style: TextStyle(
+                              color: stockColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product["name"] ?? "No name",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: List.generate(
+                          5,
+                          (index) => Icon(
+                            index < rating.round()
+                                ? Icons.star
+                                : Icons.star_border,
+                            size: 16,
+                            color: Colors.amber,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  if (percentOff > 0) ...[
-                    Text(
-                      "Rs.${price.toStringAsFixed(2)}",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.white60 : Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                    ),
-                    Text(
-                      "Rs.${finalPrice.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFA4161A),
-                      ),
-                    ),
-                  ] else
-                    Text(
-                      "Rs.${price.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        color: Color(0xFFA4161A),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: List.generate(
-                      5,
-                      (index) => Icon(
-                        index < rating.round()
-                            ? Icons.star
-                            : Icons.star_border,
-                        size: 16,
-                        color: Colors.amber,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
