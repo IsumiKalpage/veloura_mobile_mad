@@ -22,7 +22,7 @@ class WelcomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: isDark
           ? Colors.black
-          : const Color(0xFFFDF3F3), // light pinkish background
+          : const Color(0xFFFDF3F3), 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
