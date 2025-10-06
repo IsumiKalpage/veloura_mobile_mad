@@ -7,16 +7,16 @@ import 'features/auth/presentation/welcome_screen.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/register_screen.dart';
 import 'features/home/presentation/home_screen.dart';
-import 'core/theme/theme_provider.dart'; 
+import 'core/theme/theme_provider.dart';
 
-class VelouraApp extends StatefulWidget {
+class VelouraApp extends ConsumerStatefulWidget {
   const VelouraApp({super.key});
 
   @override
-  State<VelouraApp> createState() => _VelouraAppState();
+  ConsumerState<VelouraApp> createState() => _VelouraAppState();
 }
 
-class _VelouraAppState extends State<VelouraApp> {
+class _VelouraAppState extends ConsumerState<VelouraApp> {
   final _storage = const FlutterSecureStorage();
   String? _initialRoute;
 
@@ -24,15 +24,47 @@ class _VelouraAppState extends State<VelouraApp> {
   void initState() {
     super.initState();
     _checkLoginStatus();
+    _loadThemePreference();
   }
 
   Future<void> _checkLoginStatus() async {
     final token = await _storage.read(key: "token");
-
     setState(() {
-      _initialRoute =
-          (token != null && token.isNotEmpty) ? '/home' : '/welcome';
+      _initialRoute = (token != null && token.isNotEmpty) ? '/home' : '/welcome';
     });
+  }
+
+  Future<void> _loadThemePreference() async {
+    final savedTheme = await _storage.read(key: "themeMode");
+
+    if (savedTheme != null) {
+      final notifier = ref.read(themeModeProvider.notifier);
+      switch (savedTheme) {
+        case "dark":
+          notifier.state = ThemeMode.dark;
+          break;
+        case "light":
+          notifier.state = ThemeMode.light;
+          break;
+        default:
+          notifier.state = ThemeMode.system;
+      }
+    }
+  }
+
+  Future<void> _saveThemePreference(ThemeMode mode) async {
+    String value;
+    switch (mode) {
+      case ThemeMode.dark:
+        value = "dark";
+        break;
+      case ThemeMode.light:
+        value = "light";
+        break;
+      default:
+        value = "system";
+    }
+    await _storage.write(key: "themeMode", value: value);
   }
 
   @override
@@ -74,12 +106,19 @@ class _VelouraAppState extends State<VelouraApp> {
     return Consumer(
       builder: (context, ref, _) {
         final themeMode = ref.watch(themeModeProvider);
+
+        ref.listen<ThemeMode>(themeModeProvider, (previous, next) {
+          if (previous != next) {
+            _saveThemePreference(next);
+          }
+        });
+
         return MaterialApp.router(
           title: 'Veloura',
           debugShowCheckedModeBanner: false,
-          theme: lightTheme, 
-          darkTheme: darkTheme, 
-          themeMode: themeMode,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: themeMode, 
           routerConfig: router,
         );
       },

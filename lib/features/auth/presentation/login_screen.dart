@@ -35,6 +35,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     ref.listen<AsyncValue<Map<String, dynamic>?>>(authStateProvider,
         (previous, next) {
       if (next.hasError) {
@@ -60,14 +61,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Image.asset("assets/logo.png", height: 80),
             const SizedBox(height: 16),
           ],
-          const Text(
+          Text(
             "Login to your Account",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             "Enter your email and password to log in",
-            style: TextStyle(fontSize: 14, color: Colors.black54),
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
           ),
           const SizedBox(height: 30),
 
@@ -77,12 +85,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: "Email",
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: _inputDecoration(
+                    hint: "Email",
+                    icon: Icons.email_outlined,
+                    isDark: isDark,
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return "Email is required";
@@ -94,21 +101,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: _inputDecoration(
+                    hint: "Password",
+                    icon: Icons.lock_outline,
+                    isDark: isDark,
+                    suffix: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
                       onPressed: () {
                         setState(() {
                           _obscurePassword = !_obscurePassword;
                         });
                       },
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   validator: (v) {
@@ -130,14 +139,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             setState(() => _rememberMe = val ?? false);
                           },
                         ),
-                        const Text("Remember me"),
+                        Text(
+                          "Remember me",
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
                       ],
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: const Text(
+                      child: Text(
                         "Forgot Password?",
-                        style: TextStyle(color: Colors.black87),
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
                       ),
                     ),
                   ],
@@ -164,13 +180,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                 const SizedBox(height: 20),
                 Row(
-                  children: const [
-                    Expanded(child: Divider(thickness: 1)),
+                  children: [
+                    const Expanded(child: Divider(thickness: 1)),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text("Or login with"),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        "Or login with",
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
+                      ),
                     ),
-                    Expanded(child: Divider(thickness: 1)),
+                    const Expanded(child: Divider(thickness: 1)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -186,16 +207,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 GestureDetector(
                   onTap: _goToRegister,
-                  child: const Text.rich(
+                  child: Text.rich(
                     TextSpan(
                       text: "Don’t have an account? ",
-                      style: TextStyle(color: Colors.black87),
-                      children: [
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                      children: const [
                         TextSpan(
                           text: "Sign Up",
                           style: TextStyle(
-                              color: AppTheme.primaryColor,
-                              fontWeight: FontWeight.bold),
+                            color: AppTheme.primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -209,21 +233,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       body: isLandscape
           ? Row(
               children: [
                 Expanded(
                   flex: 4,
-                  child: Center(child: Image.asset("assets/logo.png", height: 120)),
+                  child: Center(
+                    child: Image.asset("assets/logo.png", height: 120),
+                  ),
                 ),
-                Expanded(
-                  flex: 6,
-                  child: form,
-                ),
+                Expanded(flex: 6, child: form),
               ],
             )
           : Center(child: form),
+    );
+  }
+
+  InputDecoration _inputDecoration({
+    required String hint,
+    required IconData icon,
+    bool isDark = false,
+    Widget? suffix,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(
+        color: isDark ? Colors.white60 : Colors.black54,
+      ),
+      prefixIcon: Icon(icon, color: isDark ? Colors.white70 : Colors.black54),
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: isDark ? Colors.grey[900] : Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
     );
   }
 

@@ -36,6 +36,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     ref.listen<AsyncValue<Map<String, dynamic>?>>(authStateProvider,
         (previous, next) {
       if (next.hasError) {
@@ -46,7 +48,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
       if (next.hasValue && next.value != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registration successful. Please login.")),
+          const SnackBar(
+              content: Text("Registration successful. Please login.")),
         );
         context.pop();
       }
@@ -64,14 +67,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Image.asset("assets/logo.png", height: 80),
             const SizedBox(height: 16),
           ],
-          const Text(
+          Text(
             "Sign up for an Account",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             "Enter your details to create an account",
-            style: TextStyle(fontSize: 14, color: Colors.black54),
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
           ),
           const SizedBox(height: 30),
 
@@ -79,15 +89,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             key: _formKey,
             child: Column(
               children: [
-                TextFormField(
+                _inputField(
                   controller: _nameController,
-                  decoration: InputDecoration(
-                    hintText: "Full Name",
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                  hint: "Full Name",
+                  icon: Icons.person_outline,
+                  isDark: isDark,
                   validator: (v) {
                     if (v == null || v.isEmpty) return "Name is required";
                     if (v.length < 2) return "Min 2 characters";
@@ -95,15 +101,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                _inputField(
                   controller: _emailController,
-                  decoration: InputDecoration(
-                    hintText: "Email",
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                  hint: "Email",
+                  icon: Icons.email_outlined,
+                  isDark: isDark,
                   validator: (v) {
                     if (v == null || v.isEmpty) return "Email is required";
                     if (!v.contains("@")) return "Enter a valid email";
@@ -111,25 +113,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                _inputField(
                   controller: _passwordController,
+                  hint: "Password",
+                  icon: Icons.lock_outline,
+                  isDark: isDark,
                   obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
+                  suffix: IconButton(
+                    icon: Icon(
+                      _obscurePassword
                           ? Icons.visibility_off
-                          : Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                          : Icons.visibility,
+                      color: isDark ? Colors.white70 : Colors.black87,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return "Password is required";
@@ -138,28 +139,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                _inputField(
                   controller: _confirmController,
+                  hint: "Confirm Password",
+                  icon: Icons.lock_outline,
+                  isDark: isDark,
                   obscureText: _obscureConfirm,
-                  decoration: InputDecoration(
-                    hintText: "Confirm Password",
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscureConfirm
+                  suffix: IconButton(
+                    icon: Icon(
+                      _obscureConfirm
                           ? Icons.visibility_off
-                          : Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirm = !_obscureConfirm;
-                        });
-                      },
+                          : Icons.visibility,
+                      color: isDark ? Colors.white70 : Colors.black87,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirm = !_obscureConfirm;
+                      });
+                    },
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return "Please confirm password";
+                    if (v == null || v.isEmpty) {
+                      return "Please confirm password";
+                    }
                     if (v != _passwordController.text) {
                       return "Passwords don’t match";
                     }
@@ -190,11 +192,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 GestureDetector(
                   onTap: () => context.pop(),
-                  child: const Text.rich(
+                  child: Text.rich(
                     TextSpan(
                       text: "Already have an account? ",
-                      style: TextStyle(color: Colors.black87),
-                      children: [
+                      style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87),
+                      children: const [
                         TextSpan(
                           text: "Log In",
                           style: TextStyle(
@@ -213,21 +216,48 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       body: isLandscape
           ? Row(
               children: [
                 Expanded(
                   flex: 4,
-                  child: Center(child: Image.asset("assets/logo.png", height: 120)),
+                  child: Center(
+                      child: Image.asset("assets/logo.png", height: 120)),
                 ),
-                Expanded(
-                  flex: 6,
-                  child: form,
-                ),
+                Expanded(flex: 6, child: form),
               ],
             )
           : Center(child: form),
+    );
+  }
+
+  Widget _inputField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required bool isDark,
+    bool obscureText = false,
+    Widget? suffix,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle:
+            TextStyle(color: isDark ? Colors.white60 : Colors.black54),
+        prefixIcon: Icon(icon, color: isDark ? Colors.white70 : Colors.black54),
+        suffixIcon: suffix,
+        filled: true,
+        fillColor: isDark ? Colors.grey[900] : Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      validator: validator,
     );
   }
 }

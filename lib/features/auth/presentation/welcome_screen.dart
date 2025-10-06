@@ -10,6 +10,7 @@ class WelcomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = authState.value?["user"];
@@ -19,32 +20,34 @@ class WelcomeScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF3F3), 
+      backgroundColor: isDark
+          ? Colors.black
+          : const Color(0xFFFDF3F3), // light pinkish background
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                "assets/logo.png",
-                height: 60,
-              ),
+              Image.asset("assets/logo.png", height: 60),
               const SizedBox(height: 20),
-
-              const Text(
+              Text(
                 "Welcome to Veloura",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFA4161A),
+                  color: isDark ? Colors.white : const Color(0xFFA4161A),
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Luxury skincare and beauty essentials\ndesigned for you.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54, height: 1.5),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 50),
 
@@ -56,9 +59,12 @@ class WelcomeScreen extends ConsumerWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
+                      color: isDark
+                          ? Colors.white.withOpacity(0.08)
+                          : Colors.white.withOpacity(0.25),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withOpacity(0.4)),
+                      border:
+                          Border.all(color: Colors.white.withOpacity(0.4)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black12.withOpacity(0.1),
@@ -88,22 +94,30 @@ class WelcomeScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 16),
                         Row(
-                          children: const [
+                          children: [
                             Expanded(
                                 child: Divider(
-                              color: Colors.white54,
+                              color: isDark
+                                  ? Colors.white24
+                                  : Colors.white54,
                               thickness: 0.8,
                             )),
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
                               child: Text(
                                 "or",
-                                style: TextStyle(color: Colors.black54),
+                                style: TextStyle(
+                                  color:
+                                      isDark ? Colors.white70 : Colors.black54,
+                                ),
                               ),
                             ),
                             Expanded(
                                 child: Divider(
-                              color: Colors.white54,
+                              color: isDark
+                                  ? Colors.white24
+                                  : Colors.white54,
                               thickness: 0.8,
                             )),
                           ],
@@ -130,9 +144,9 @@ class WelcomeScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _socialButton(Icons.g_mobiledata, Colors.red),
+                            _socialButton(Icons.g_mobiledata, Colors.red, isDark),
                             const SizedBox(width: 20),
-                            _socialButton(Icons.apple, Colors.black),
+                            _socialButton(Icons.apple, Colors.black, isDark),
                           ],
                         ),
                       ],
@@ -140,12 +154,13 @@ class WelcomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              const Text(
+              Text(
                 "© 2025 Veloura. All rights reserved.",
-                style: TextStyle(color: Colors.black38, fontSize: 12),
+                style: TextStyle(
+                  color: isDark ? Colors.white54 : Colors.black38,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -154,10 +169,12 @@ class WelcomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _socialButton(IconData icon, Color color) {
+  Widget _socialButton(IconData icon, Color color, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: isDark
+            ? Colors.white.withOpacity(0.1)
+            : Colors.white.withOpacity(0.8),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(

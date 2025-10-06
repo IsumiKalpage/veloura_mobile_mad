@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final themeModeProvider =
-    StateProvider<ThemeMode>((ref) => ThemeMode.light);
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
 final ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
@@ -24,6 +23,7 @@ final ThemeData lightTheme = ThemeData(
     titleLarge: TextStyle(color: Colors.black87),
   ),
 );
+
 
 final ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
