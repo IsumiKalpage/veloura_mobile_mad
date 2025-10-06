@@ -209,8 +209,7 @@ class AccountScreen extends ConsumerWidget {
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon:
-                Icon(Icons.menu, color: Theme.of(context).iconTheme.color),
+            icon: Icon(Icons.menu, color: Theme.of(context).iconTheme.color),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -221,8 +220,8 @@ class AccountScreen extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon:
-                Icon(Icons.person_outline, color: Theme.of(context).iconTheme.color),
+            icon: Icon(Icons.person_outline,
+                color: Theme.of(context).iconTheme.color),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Profile tapped")),
@@ -255,14 +254,19 @@ class AccountScreen extends ConsumerWidget {
                     onTap: () => _showImageSourceActionSheet(context, ref),
                     child: CircleAvatar(
                       radius: 35,
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surface,
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       backgroundImage: profileImagePath != null
                           ? FileImage(File(profileImagePath))
                           : null,
                       child: profileImagePath == null
-                          ? const Icon(Icons.camera_alt,
-                              size: 30, color: Colors.white)
+                          ? Icon(
+                              Icons.camera_alt,
+                              size: 30,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
+                            )
                           : null,
                     ),
                   ),
@@ -332,8 +336,8 @@ class AccountScreen extends ConsumerWidget {
                   Colors.green, () => _toggleBatteryStatus(ref)),
               if (batteryLevel != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Row(
                     children: [
                       const Icon(Icons.battery_charging_full,
@@ -360,8 +364,8 @@ class AccountScreen extends ConsumerWidget {
                 ),
                 title: const Text(
                   "Logout",
-                  style: TextStyle(
-                      color: Colors.red, fontWeight: FontWeight.bold),
+                  style:
+                      TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                 ),
                 onTap: () async {
                   await ref.read(authStateProvider.notifier).logout();
@@ -380,8 +384,7 @@ class AccountScreen extends ConsumerWidget {
                             "Logged Out",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).colorScheme.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                           content: const Text(
@@ -470,8 +473,8 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTile(BuildContext context, IconData icon, String title,
-      Color color, VoidCallback onTap) {
+  Widget _buildTile(
+      BuildContext context, IconData icon, String title, Color color, VoidCallback onTap) {
     return ListTile(
       leading: CircleAvatar(
         radius: 20,
