@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,6 +7,7 @@ import 'features/auth/presentation/welcome_screen.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/register_screen.dart';
 import 'features/home/presentation/home_screen.dart';
+import 'core/theme/theme_provider.dart'; 
 
 class VelouraApp extends StatefulWidget {
   const VelouraApp({super.key});
@@ -69,13 +71,18 @@ class _VelouraAppState extends State<VelouraApp> {
       ],
     );
 
-    return MaterialApp.router(
-      title: 'Veloura',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(useMaterial3: true),
-      darkTheme: ThemeData.dark(useMaterial3: true),
-      themeMode: ThemeMode.system,
-      routerConfig: router,
+    return Consumer(
+      builder: (context, ref, _) {
+        final themeMode = ref.watch(themeModeProvider);
+        return MaterialApp.router(
+          title: 'Veloura',
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme, 
+          darkTheme: darkTheme, 
+          themeMode: themeMode,
+          routerConfig: router,
+        );
+      },
     );
   }
 }

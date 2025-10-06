@@ -82,11 +82,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text("Contact Us"),
-            onTap: () => setState(() => _selectedIndex = 4),
-          )
         ],
       ),
     );

@@ -9,11 +9,9 @@ import 'package:battery_plus/battery_plus.dart';
 
 import '../../auth/providers/auth_provider.dart';
 import '../../orders/presentation/order_history_screen.dart';
-
+import '../../../../core/theme/theme_provider.dart';
 
 final profileImageProvider = StateProvider<String?>((ref) => null);
-
-
 final batteryLevelProvider = StateProvider<int?>((ref) => null);
 
 class AccountScreen extends ConsumerWidget {
@@ -21,11 +19,14 @@ class AccountScreen extends ConsumerWidget {
 
   Drawer _buildDrawer(BuildContext context) {
     return Drawer(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFFA4161A)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -39,27 +40,32 @@ class AccountScreen extends ConsumerWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
+            leading: Icon(Icons.home_outlined,
+                color: Theme.of(context).iconTheme.color),
             title: const Text("Home"),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: const Icon(Icons.storefront_outlined),
+            leading: Icon(Icons.storefront_outlined,
+                color: Theme.of(context).iconTheme.color),
             title: const Text("Products"),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: const Icon(Icons.shopping_cart_outlined),
+            leading: Icon(Icons.shopping_cart_outlined,
+                color: Theme.of(context).iconTheme.color),
             title: const Text("Cart"),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: const Icon(Icons.person_outline),
+            leading: Icon(Icons.person_outline,
+                color: Theme.of(context).iconTheme.color),
             title: const Text("Account"),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: const Icon(Icons.inventory_2_outlined),
+            leading: Icon(Icons.inventory_2_outlined,
+                color: Theme.of(context).iconTheme.color),
             title: const Text("Orders"),
             onTap: () {
               Navigator.pop(context);
@@ -70,7 +76,8 @@ class AccountScreen extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person_outline),
+            leading: Icon(Icons.person_outline,
+                color: Theme.of(context).iconTheme.color),
             title: const Text("Contact Us"),
             onTap: () => Navigator.pop(context),
           ),
@@ -88,12 +95,13 @@ class AccountScreen extends ConsumerWidget {
       ref.read(profileImageProvider.notifier).state = pickedFile.path;
     }
 
-    Navigator.pop(context); 
+    Navigator.pop(context);
   }
 
   void _showImageSourceActionSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (_) => SafeArea(
         child: Wrap(
           children: [
@@ -191,14 +199,18 @@ class AccountScreen extends ConsumerWidget {
     final profileImagePath = ref.watch(profileImageProvider);
     final batteryLevel = ref.watch(batteryLevelProvider);
 
+    final isDark = ref.watch(themeModeProvider) == ThemeMode.dark;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: _buildDrawer(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black87),
+            icon:
+                Icon(Icons.menu, color: Theme.of(context).iconTheme.color),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -209,7 +221,8 @@ class AccountScreen extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline, color: Colors.black87),
+            icon:
+                Icon(Icons.person_outline, color: Theme.of(context).iconTheme.color),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Profile tapped")),
@@ -225,7 +238,7 @@ class AccountScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -242,7 +255,8 @@ class AccountScreen extends ConsumerWidget {
                     onTap: () => _showImageSourceActionSheet(context, ref),
                     child: CircleAvatar(
                       radius: 35,
-                      backgroundColor: Colors.grey,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surface,
                       backgroundImage: profileImagePath != null
                           ? FileImage(File(profileImagePath))
                           : null,
@@ -258,18 +272,15 @@ class AccountScreen extends ConsumerWidget {
                     children: [
                       Text(
                         fullName,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         user["email"] ?? "",
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black54,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),
@@ -279,38 +290,50 @@ class AccountScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
 
-            // ===== Sections =====
-            _buildSectionHeader("Update your info"),
-            _buildCard([
-              _buildTile(Icons.person, "Account Information", Colors.blue, () {}),
-              _buildTile(Icons.credit_card, "Billing", Colors.green, () {}),
-            ]),
-
-            const SizedBox(height: 20),
-
-            _buildSectionHeader("Preferences"),
-            _buildCard([
-              _buildTile(
-                  Icons.notifications, "Notifications", Colors.orange, () {}),
-              _buildTile(Icons.dark_mode, "Change to Dark Mode", Colors.purple,
+            _buildSectionHeader(context, "Update your info"),
+            _buildCard(context, [
+              _buildTile(context, Icons.person, "Account Information",
+                  Colors.blue, () {}),
+              _buildTile(context, Icons.credit_card, "Billing", Colors.green,
                   () {}),
             ]),
 
             const SizedBox(height: 20),
 
-            _buildSectionHeader("More Information"),
-            _buildCard([
-              _buildTile(Icons.info, "About Us", Colors.teal, () {}),
-              _buildTile(Icons.privacy_tip, "Privacy", Colors.deepPurple, () {}),
-              _buildTile(Icons.contact_mail, "Contact Us", Colors.indigo, () {}),
-              _buildTile(Icons.location_on, "Show My Location", Colors.red,
-                  () => _showMyLocation(context)),
-              _buildTile(Icons.battery_full, "Toggle Battery Status",
+            _buildSectionHeader(context, "Preferences"),
+            _buildCard(context, [
+              _buildTile(context, Icons.notifications, "Notifications",
+                  Colors.orange, () {}),
+              _buildTile(
+                context,
+                isDark ? Icons.light_mode : Icons.dark_mode,
+                isDark ? "Change to Light Mode" : "Change to Dark Mode",
+                isDark ? Colors.yellow : Colors.purple,
+                () {
+                  final notifier = ref.read(themeModeProvider.notifier);
+                  notifier.state =
+                      isDark ? ThemeMode.light : ThemeMode.dark;
+                },
+              ),
+            ]),
+
+            const SizedBox(height: 20),
+
+            _buildSectionHeader(context, "More Information"),
+            _buildCard(context, [
+              _buildTile(context, Icons.info, "About Us", Colors.teal, () {}),
+              _buildTile(context, Icons.privacy_tip, "Privacy",
+                  Colors.deepPurple, () {}),
+              _buildTile(context, Icons.contact_mail, "Contact Us",
+                  Colors.indigo, () {}),
+              _buildTile(context, Icons.location_on, "Show My Location",
+                  Colors.red, () => _showMyLocation(context)),
+              _buildTile(context, Icons.battery_full, "Toggle Battery Status",
                   Colors.green, () => _toggleBatteryStatus(ref)),
               if (batteryLevel != null)
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: Row(
                     children: [
                       const Icon(Icons.battery_charging_full,
@@ -318,8 +341,7 @@ class AccountScreen extends ConsumerWidget {
                       const SizedBox(width: 10),
                       Text(
                         "Battery Level: $batteryLevel%",
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),
@@ -328,8 +350,8 @@ class AccountScreen extends ConsumerWidget {
 
             const SizedBox(height: 20),
 
-            _buildSectionHeader("Account Actions"),
-            _buildCard([
+            _buildSectionHeader(context, "Account Actions"),
+            _buildCard(context, [
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
@@ -338,7 +360,8 @@ class AccountScreen extends ConsumerWidget {
                 ),
                 title: const Text(
                   "Logout",
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.red, fontWeight: FontWeight.bold),
                 ),
                 onTap: () async {
                   await ref.read(authStateProvider.notifier).logout();
@@ -348,14 +371,17 @@ class AccountScreen extends ConsumerWidget {
                       barrierDismissible: false,
                       builder: (BuildContext context) {
                         return AlertDialog(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surface,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          title: const Text(
+                          title: Text(
                             "Logged Out",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFFA4161A),
+                              color:
+                                  Theme.of(context).colorScheme.primary,
                             ),
                           ),
                           content: const Text(
@@ -365,14 +391,15 @@ class AccountScreen extends ConsumerWidget {
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop(); // close dialog
+                                Navigator.of(context).pop();
                                 context.go('/welcome');
                               },
-                              child: const Text(
+                              child: Text(
                                 "OK",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFFA4161A),
+                                  color:
+                                      Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ),
@@ -385,7 +412,6 @@ class AccountScreen extends ConsumerWidget {
               ),
             ]),
 
-
             const SizedBox(height: 40),
           ],
         ),
@@ -393,27 +419,30 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(
           title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.black54,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withOpacity(0.8),
+              ),
         ),
       ),
     );
   }
 
-  Widget _buildCard(List<Widget> children) {
+  Widget _buildCard(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -429,15 +458,20 @@ class AccountScreen extends ConsumerWidget {
           for (int i = 0; i < children.length; i++) ...[
             children[i],
             if (i < children.length - 1)
-              const Divider(height: 1, thickness: 0.5, indent: 70),
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                indent: 70,
+                color: Theme.of(context).dividerColor.withOpacity(0.3),
+              ),
           ]
         ],
       ),
     );
   }
 
-  Widget _buildTile(
-      IconData icon, String title, Color color, VoidCallback onTap) {
+  Widget _buildTile(BuildContext context, IconData icon, String title,
+      Color color, VoidCallback onTap) {
     return ListTile(
       leading: CircleAvatar(
         radius: 20,
@@ -446,10 +480,13 @@ class AccountScreen extends ConsumerWidget {
       ),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(fontWeight: FontWeight.w500),
       ),
-      trailing:
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black38),
+      trailing: Icon(Icons.arrow_forward_ios,
+          size: 16, color: Theme.of(context).iconTheme.color?.withOpacity(0.6)),
       onTap: onTap,
     );
   }
