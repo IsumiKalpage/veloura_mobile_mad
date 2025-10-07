@@ -6,6 +6,7 @@ import '../../cart/providers/cart_provider.dart';
 import '../../orders/presentation/order_history_screen.dart';
 import '../../orders/presentation/checkout_screen.dart';
 import '../../products/presentation/product_detail_screen.dart';
+import '../../products/presentation/favorites_screen.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -67,9 +68,15 @@ class CartScreen extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text("Contact Us"),
-            onTap: () => Navigator.pop(context),
+            leading: const Icon(Icons.favorite_border),
+            title: const Text("Favorites"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+              );
+            },
           ),
         ],
       ),

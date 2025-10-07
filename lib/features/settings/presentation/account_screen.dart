@@ -10,6 +10,7 @@ import 'package:battery_plus/battery_plus.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../orders/presentation/order_history_screen.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../products/presentation/favorites_screen.dart';
 
 final profileImageProvider = StateProvider<String?>((ref) => null);
 final batteryLevelProvider = StateProvider<int?>((ref) => null);
@@ -76,10 +77,15 @@ class AccountScreen extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.person_outline,
-                color: Theme.of(context).iconTheme.color),
-            title: const Text("Contact Us"),
-            onTap: () => Navigator.pop(context),
+            leading: const Icon(Icons.favorite_border),
+            title: const Text("Favorites"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+              );
+            },
           ),
         ],
       ),

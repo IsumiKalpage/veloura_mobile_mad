@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/products_provider.dart';
 import '../presentation/product_detail_screen.dart';
 import '../../orders/presentation/order_history_screen.dart';
-import '../../contact/presentation/contact_screen.dart';
+import '../../products/presentation/favorites_screen.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -67,17 +67,13 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
             },
           ),
           ListTile(
-            leading: Icon(Icons.contact_mail_outlined,
-                color: isDark ? Colors.white70 : Colors.black87),
-            title: Text("Contact Us",
-                style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontWeight: FontWeight.w500)),
+            leading: const Icon(Icons.favorite_border),
+            title: const Text("Favorites"),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const ContactUsScreen()),
+                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
               );
             },
           ),

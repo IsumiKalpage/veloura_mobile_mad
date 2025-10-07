@@ -17,6 +17,7 @@ dependencies:
   # State management
   flutter_riverpod: ^2.5.1
   image_picker: ^1.0.7
+  shared_preferences: ^2.3.2
 
   # API calls
   dio: ^5.7.0

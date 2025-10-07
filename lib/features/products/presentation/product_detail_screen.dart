@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../providers/favorites_provider.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> product;
@@ -16,7 +17,6 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int quantity = 1;
-  bool isWishlisted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +49,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final authState = ref.watch(authStateProvider).value;
     final email = authState?["user"]?["email"] ?? "";
 
+    ref.read(favoritesProvider.notifier).loadFavorites(email);
+
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
     final theme = Theme.of(context);
-    // ignore: unused_local_variable
     final isDark = theme.brightness == Brightness.dark;
+
+    final favorites = ref.watch(favoritesProvider);
+    final isWishlisted = ref
+        .read(favoritesProvider.notifier)
+        .isFavorite(product['id'].toString());
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -121,11 +127,23 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                     isWishlisted
                                         ? Icons.favorite
                                         : Icons.favorite_border,
-                                    color: Colors.redAccent,
+                                    color: Colors.red,
                                   ),
                                   onPressed: () {
-                                    setState(
-                                        () => isWishlisted = !isWishlisted);
+                                    ref
+                                        .read(favoritesProvider.notifier)
+                                        .toggleFavorite(product);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(isWishlisted
+                                            ? "Removed from Favorites"
+                                            : "Added to Favorites"),
+                                        duration:
+                                            const Duration(milliseconds: 800),
+                                      ),
+                                    );
+                                    setState(() {});
                                   },
                                 ),
                               ),
@@ -211,10 +229,23 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                               isWishlisted
                                   ? Icons.favorite
                                   : Icons.favorite_border,
-                              color: Colors.redAccent,
+                              color: Colors.red,
                             ),
                             onPressed: () {
-                              setState(() => isWishlisted = !isWishlisted);
+                              ref
+                                  .read(favoritesProvider.notifier)
+                                  .toggleFavorite(product);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(isWishlisted
+                                      ? "Removed from Favorites"
+                                      : "Added to Favorites"),
+                                  duration:
+                                      const Duration(milliseconds: 800),
+                                ),
+                              );
+                              setState(() {});
                             },
                           ),
                         ),
@@ -338,10 +369,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
               Text(
                 "Rs.${finalPrice.toStringAsFixed(2)}",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFFA4161A),
+                  color: Color(0xFFA4161A),
                 ),
               ),
               const SizedBox(height: 6),
