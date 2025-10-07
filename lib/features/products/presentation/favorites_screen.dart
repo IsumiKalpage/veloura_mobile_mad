@@ -18,6 +18,13 @@ class FavoritesScreen extends ConsumerWidget {
     final favorites = ref.watch(favoritesProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    int crossAxisCount = isLandscape
+        ? (screenWidth > 1200 ? 5 : screenWidth > 900 ? 4 : 3)
+        : (screenWidth > 700 ? 3 : 2);
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
@@ -44,11 +51,11 @@ class FavoritesScreen extends ConsumerWidget {
           : GridView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: favorites.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.68,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: isLandscape ? 0.7 : 0.68,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
               ),
               itemBuilder: (context, index) {
                 final product = favorites[index];
@@ -150,7 +157,8 @@ class FavoritesScreen extends ConsumerWidget {
                           ),
                         );
                       },
-                      child: const Icon(Icons.favorite, color: Colors.red, size: 26),
+                      child:
+                          const Icon(Icons.favorite, color: Colors.red, size: 26),
                     ),
                   ),
                   if (percentOff > 0)
@@ -158,8 +166,8 @@ class FavoritesScreen extends ConsumerWidget {
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(6),
@@ -218,7 +226,6 @@ class FavoritesScreen extends ConsumerWidget {
                       ),
                     ),
                   const SizedBox(height: 6),
-
                   Row(
                     children: [
                       Icon(Icons.circle, size: 10, color: stockColor),
@@ -234,7 +241,6 @@ class FavoritesScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-
                   Row(
                     children: List.generate(
                       5,

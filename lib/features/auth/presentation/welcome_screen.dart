@@ -11,6 +11,8 @@ class WelcomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = authState.value?["user"];
@@ -18,11 +20,166 @@ class WelcomeScreen extends ConsumerWidget {
         context.go('/home');
       }
     });
+    
+    if (isLandscape) {
+      return Scaffold(
+        backgroundColor: isDark ? Colors.black : const Color(0xFFFDF3F3),
+        body: Row(
+          children: [
+            Expanded(
+              flex: 5,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset("assets/logo.png", height: 80),
+                    const SizedBox(height: 30),
+                    Text(
+                      "Welcome to Veloura",
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : const Color(0xFFA4161A),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Luxury skincare and beauty essentials\ndesigned for you.",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    Text(
+                      "© 2025 Veloura. All rights reserved.",
+                      style: TextStyle(
+                        color: isDark ? Colors.white54 : Colors.black38,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            Expanded(
+              flex: 5,
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                    child: Container(
+                      width: 420,
+                      padding: const EdgeInsets.all(30),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.08)
+                            : Colors.white.withOpacity(0.25),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: Colors.white.withOpacity(0.4)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12.withOpacity(0.1),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => context.push('/register'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFA4161A),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              minimumSize: const Size(double.infinity, 50),
+                              elevation: 3,
+                            ),
+                            child: const Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Divider(
+                                color:
+                                    isDark ? Colors.white24 : Colors.white54,
+                                thickness: 0.8,
+                              )),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  "or",
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Colors.black54,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                  child: Divider(
+                                color:
+                                    isDark ? Colors.white24 : Colors.white54,
+                                thickness: 0.8,
+                              )),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton(
+                            onPressed: () => context.push('/login'),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                  color: Color(0xFFA4161A), width: 1.2),
+                              foregroundColor: const Color(0xFFA4161A),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                            child: const Text(
+                              "Sign In",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _socialButton(Icons.g_mobiledata, Colors.red, isDark),
+                              const SizedBox(width: 20),
+                              _socialButton(Icons.apple, Colors.black, isDark),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
-      backgroundColor: isDark
-          ? Colors.black
-          : const Color(0xFFFDF3F3), 
+      backgroundColor: isDark ? Colors.black : const Color(0xFFFDF3F3),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -50,7 +207,6 @@ class WelcomeScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 50),
-
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: BackdropFilter(
@@ -63,8 +219,7 @@ class WelcomeScreen extends ConsumerWidget {
                           ? Colors.white.withOpacity(0.08)
                           : Colors.white.withOpacity(0.25),
                       borderRadius: BorderRadius.circular(24),
-                      border:
-                          Border.all(color: Colors.white.withOpacity(0.4)),
+                      border: Border.all(color: Colors.white.withOpacity(0.4)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black12.withOpacity(0.1),
@@ -97,9 +252,8 @@ class WelcomeScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                                 child: Divider(
-                              color: isDark
-                                  ? Colors.white24
-                                  : Colors.white54,
+                              color:
+                                  isDark ? Colors.white24 : Colors.white54,
                               thickness: 0.8,
                             )),
                             Padding(
@@ -108,16 +262,16 @@ class WelcomeScreen extends ConsumerWidget {
                               child: Text(
                                 "or",
                                 style: TextStyle(
-                                  color:
-                                      isDark ? Colors.white70 : Colors.black54,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black54,
                                 ),
                               ),
                             ),
                             Expanded(
                                 child: Divider(
-                              color: isDark
-                                  ? Colors.white24
-                                  : Colors.white54,
+                              color:
+                                  isDark ? Colors.white24 : Colors.white54,
                               thickness: 0.8,
                             )),
                           ],
