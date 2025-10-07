@@ -22,7 +22,7 @@ class CartScreen extends ConsumerWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2C2C2C) : const Color(0xFFA4161A),
+              color: isDark ? const Color(0xFF2C2C2C) : const Color.fromARGB(255, 243, 194, 196),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

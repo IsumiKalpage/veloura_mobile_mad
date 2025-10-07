@@ -31,7 +31,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-              color: isDark ? Colors.grey[850] : const Color(0xFFA4161A),
+              color: isDark ? Colors.grey[850] : const Color.fromARGB(255, 243, 194, 196),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
