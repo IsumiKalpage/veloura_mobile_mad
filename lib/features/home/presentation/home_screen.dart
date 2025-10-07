@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:veloura_mobile/features/products/presentation/favorites_screen.dart';
 
 import '../../products/presentation/products_screen.dart';
 import '../../cart/presentation/cart_screen.dart';
@@ -8,6 +9,7 @@ import '../../cart/providers/cart_provider.dart';
 import '../../products/providers/products_provider.dart';
 import '../../products/presentation/product_detail_screen.dart';
 import '../../orders/presentation/order_history_screen.dart';
+import '../../products/presentation/favorites_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +26,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ProductsScreen(),
     CartScreen(),
     AccountScreen(),
+    FavoritesScreen()
   ];
 
   void _onItemTapped(int index) {
@@ -75,6 +78,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const OrderHistoryScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.favorite_border,
+                color: isDark ? Colors.white70 : Colors.black87),
+            title: Text("Favorites",
+                style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w500)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
               );
             },
           ),
